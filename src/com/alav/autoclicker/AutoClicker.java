@@ -4,11 +4,12 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 
 public class AutoClicker {
-    Robot robot; //Genera eventos de entrada nativos del SO para controlar el ratón
+    private Robot robot;
     private boolean running = false;
+    private boolean paused = false;
+    private int clickType = InputEvent.BUTTON1_DOWN_MASK;  // Por defecto, clic izquierdo
 
-
-    public AutoClicker(){
+    public AutoClicker() {
         try {
             robot = new Robot();
         } catch (AWTException e) {
@@ -17,27 +18,49 @@ public class AutoClicker {
         }
     }
 
-    //Inicia el proceso del autoclicker
-    public void startClicking(int delay){
-    running = true;
-    while (running){
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.delay(50); //Duración del click
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-        robot.delay(delay); //Tiempo entre clicks
+    // Configura el tipo de clic según la selección del usuario
+    public void setClickType(String type) {
+        switch (type) {
+            case "Left Click":
+                clickType = InputEvent.BUTTON1_DOWN_MASK;  // Clic izquierdo
+                break;
+            case "Right Click":
+                clickType = InputEvent.BUTTON3_DOWN_MASK;  // Clic derecho
+                break;
+            case "Both":
+                clickType = InputEvent.BUTTON1_DOWN_MASK | InputEvent.BUTTON3_DOWN_MASK;  // Ambos clics
+                break;
+        }
     }
+
+    // Inicia los clics en un hilo separado
+    public void startClicking(int delay, Runnable onClick) {
+        running = true;
+        paused = false;
+
+        new Thread(() -> {
+            while (running) {
+                if (!paused) {
+                    robot.mousePress(clickType);
+                    robot.delay(50);
+                    robot.mouseRelease(clickType);
+                    robot.delay(delay);
+                    onClick.run();  // Actualizar el contador después de cada clic
+                }
+            }
+        }).start();
     }
-    //Permite detener el autoclicker.
+
+    public void pauseClicking() {
+        paused = true;
+    }
+
+    public void resumeClicking() {
+        paused = false;
+    }
+
     public void stopClicking() {
         running = false;
     }
-
-    public static void main(String[] args) {
-        AutoClicker clicker = new AutoClicker();
-        clicker.startClicking(1000); // 1000ms = 1 segundo entre clicks
-    }
-
-
-
-
 }
+
