@@ -32,6 +32,14 @@ Este proyecto es una aplicación de **autoclicker** desarrollada en **Java** uti
 
 ---
 
+## 🖼️ Screenshots
+
+![Java Autoclicker Screenshot](https://i.imgur.com/o84gUev.png)
+
+_Java Autoclicker Interface: Set clicks per second, choose click type, and start/stop the autoclicker._
+``
+---
+
 ## 🛠️ Requirements
 
 - **Java 17** or higher.
